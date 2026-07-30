@@ -1,0 +1,238 @@
+Do NOT rebuild the project.
+
+Do NOT create a new project.
+
+Continue working on the existing Test Academy project only.
+
+IMPORTANT:
+Do NOT change anything unless I specifically mention it below.
+
+Do NOT change:
+- UI
+- Design
+- Logo
+- Colors
+- Layout
+- Database
+- Existing Pages
+- Existing Navigation
+- Existing Features
+
+Only complete the missing features listed below.
+
+Project Name:
+Test Academy
+
+Admin Login
+
+Email:
+amanuo118@gmail.com
+
+Password:
+Amankhan123@
+
+Use these exact Admin credentials. Do not change them.
+
+==================================
+LOGIN FLOW
+==================================
+
+When the app opens:
+
+Splash Screen
+↓
+
+Get Started
+↓
+
+Student Login
+
+At the bottom:
+
+Admin Login
+
+Do not remove or change this flow.
+
+==================================
+ADMIN PANEL
+==================================
+
+After Admin Login,
+
+show the Admin Dashboard.
+
+Keep the current design exactly the same.
+
+Do not redesign anything.
+
+At the top of the dashboard show:
+
+• Total Students
+• Active Students
+• Published Content
+• Total Levels
+
+Below that, keep the same cards that students see.
+
+The only difference is:
+
+Admin should also see:
+
+• Add
+• Edit
+• Delete
+• Publish
+
+Students must NEVER see these buttons.
+
+==================================
+ELIGIBILITY
+==================================
+
+Do NOT redesign this page.
+
+Keep the same page.
+
+When students open Eligibility,
+
+they should see the published Eligibility information.
+
+Remove:
+
+"No eligibility criteria have been published yet."
+
+Admin can:
+
+Add
+
+Edit
+
+Delete
+
+Publish
+
+Students can only read.
+
+==================================
+MCQs PREPARATION
+==================================
+
+Rename Preparation to:
+
+MCQs Preparation
+
+Create 100 Levels.
+
+Each Level contains 10 MCQs.
+
+Each MCQ contains:
+
+Question
+
+Option A
+
+Option B
+
+Option C
+
+Option D
+
+Correct Answer
+
+Admin writes all questions later.
+
+Students only answer MCQs.
+
+==================================
+ESSAY PREPARATION
+==================================
+
+Add a new section.
+
+Admin:
+
+Add
+
+Edit
+
+Delete
+
+Publish
+
+Students:
+
+Read only.
+
+==================================
+PHYSICAL GUIDELINES
+==================================
+
+Add another section.
+
+Admin can publish:
+
+Running
+
+Exercise
+
+Push-ups
+
+Sit-ups
+
+Chest
+
+Height
+
+Fitness
+
+Medical
+
+Students can only read.
+
+==================================
+FINAL TEST
+==================================
+
+Move Final Test to the last section.
+
+Remove the lock.
+
+Admin creates and edits the Final Test.
+
+Students only attempt the test.
+
+==================================
+PUBLISH SYSTEM
+==================================
+
+Every section must support Publish.
+
+After Admin publishes,
+
+Students immediately see the content.
+
+No page should display:
+
+"No data published"
+
+"No eligibility criteria have been published yet"
+
+==================================
+VERY IMPORTANT
+==================================
+
+Do NOT change anything else.
+
+Do NOT redesign the project.
+
+Do NOT rebuild the project.
+
+Do NOT modify any existing working feature.
+
+Only complete the missing features listed above.
+
+Test every page.
+
+Fix every remaining error.
+
+Return a fully working Test Academy project.

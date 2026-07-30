@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "Test Academy"
+version = "1.0.0"
+id = "artifacts/test-academy"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22021
+
+[services.development]
+run = "pnpm --filter @workspace/test-academy run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/test-academy", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/test-academy/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22021"
+BASE_PATH = "/"

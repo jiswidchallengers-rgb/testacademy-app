@@ -3,20 +3,34 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Test Academy API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication
+  - name: eligibility
+    description: Eligibility criteria
+  - name: mcq
+    description: MCQ levels and questions
+  - name: essay
+    description: Essay preparation
+  - name: physical
+    description: Physical guidelines
+  - name: finaltest
+    description: Final test
+  - name: stats
+    description: Dashboard statistics
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +38,1034 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Admin login with email and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthUser"
+        "401":
+          description: Invalid credentials
+
+  /auth/student-login:
+    post:
+      operationId: studentLogin
+      tags: [auth]
+      summary: Student login by name
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentLoginInput"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthUser"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthUser"
+        "401":
+          description: Not authenticated
+
+  /eligibility:
+    get:
+      operationId: listEligibility
+      tags: [eligibility]
+      summary: List eligibility criteria
+      parameters:
+        - in: query
+          name: all
+          schema:
+            type: string
+          description: Set to "true" for admin to see all items including unpublished
+      responses:
+        "200":
+          description: List of eligibility items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EligibilityItem"
+    post:
+      operationId: createEligibility
+      tags: [eligibility]
+      summary: Create eligibility item (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EligibilityInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EligibilityItem"
+
+  /eligibility/{id}:
+    patch:
+      operationId: updateEligibility
+      tags: [eligibility]
+      summary: Update eligibility item (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EligibilityUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EligibilityItem"
+    delete:
+      operationId: deleteEligibility
+      tags: [eligibility]
+      summary: Delete eligibility item (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Deleted
+
+  /eligibility/{id}/publish:
+    patch:
+      operationId: publishEligibility
+      tags: [eligibility]
+      summary: Toggle publish eligibility item (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublishInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EligibilityItem"
+
+  /mcq/levels:
+    get:
+      operationId: listMcqLevels
+      tags: [mcq]
+      summary: List MCQ levels
+      responses:
+        "200":
+          description: List of MCQ levels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/McqLevel"
+
+  /mcq/levels/{levelId}/questions:
+    get:
+      operationId: listMcqQuestions
+      tags: [mcq]
+      summary: List questions for a level
+      parameters:
+        - in: path
+          name: levelId
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: List of questions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/McqQuestion"
+    post:
+      operationId: createMcqQuestion
+      tags: [mcq]
+      summary: Create MCQ question (admin)
+      parameters:
+        - in: path
+          name: levelId
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/McqQuestionInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/McqQuestion"
+
+  /mcq/questions/{id}:
+    patch:
+      operationId: updateMcqQuestion
+      tags: [mcq]
+      summary: Update MCQ question (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/McqQuestionUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/McqQuestion"
+    delete:
+      operationId: deleteMcqQuestion
+      tags: [mcq]
+      summary: Delete MCQ question (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Deleted
+
+  /mcq/submit:
+    post:
+      operationId: submitMcqAnswers
+      tags: [mcq]
+      summary: Submit MCQ answers for a level
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/McqSubmission"
+      responses:
+        "200":
+          description: Result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/McqResult"
+
+  /essays:
+    get:
+      operationId: listEssays
+      tags: [essay]
+      summary: List essays
+      parameters:
+        - in: query
+          name: all
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of essays
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EssayItem"
+    post:
+      operationId: createEssay
+      tags: [essay]
+      summary: Create essay (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EssayInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EssayItem"
+
+  /essays/{id}:
+    patch:
+      operationId: updateEssay
+      tags: [essay]
+      summary: Update essay (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EssayUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EssayItem"
+    delete:
+      operationId: deleteEssay
+      tags: [essay]
+      summary: Delete essay (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Deleted
+
+  /essays/{id}/publish:
+    patch:
+      operationId: publishEssay
+      tags: [essay]
+      summary: Toggle publish essay (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublishInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EssayItem"
+
+  /physical:
+    get:
+      operationId: listPhysical
+      tags: [physical]
+      summary: List physical guidelines
+      parameters:
+        - in: query
+          name: all
+          schema:
+            type: string
+        - in: query
+          name: category
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of physical guidelines
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PhysicalItem"
+    post:
+      operationId: createPhysical
+      tags: [physical]
+      summary: Create physical guideline (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PhysicalInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PhysicalItem"
+
+  /physical/{id}:
+    patch:
+      operationId: updatePhysical
+      tags: [physical]
+      summary: Update physical guideline (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PhysicalUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PhysicalItem"
+    delete:
+      operationId: deletePhysical
+      tags: [physical]
+      summary: Delete physical guideline (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Deleted
+
+  /physical/{id}/publish:
+    patch:
+      operationId: publishPhysical
+      tags: [physical]
+      summary: Toggle publish physical guideline (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublishInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PhysicalItem"
+
+  /finaltest/questions:
+    get:
+      operationId: listFinalTestQuestions
+      tags: [finaltest]
+      summary: List final test questions
+      parameters:
+        - in: query
+          name: all
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of questions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FinalTestQuestion"
+    post:
+      operationId: createFinalTestQuestion
+      tags: [finaltest]
+      summary: Create final test question (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FinalTestQuestionInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FinalTestQuestion"
+
+  /finaltest/questions/{id}:
+    patch:
+      operationId: updateFinalTestQuestion
+      tags: [finaltest]
+      summary: Update final test question (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FinalTestQuestionUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FinalTestQuestion"
+    delete:
+      operationId: deleteFinalTestQuestion
+      tags: [finaltest]
+      summary: Delete final test question (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Deleted
+
+  /finaltest/submit:
+    post:
+      operationId: submitFinalTest
+      tags: [finaltest]
+      summary: Submit final test answers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FinalTestSubmission"
+      responses:
+        "200":
+          description: Result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FinalTestResult"
+
+  /finaltest/results:
+    get:
+      operationId: listFinalTestResults
+      tags: [finaltest]
+      summary: List final test results (admin)
+      responses:
+        "200":
+          description: List of results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FinalTestResult"
+
+  /stats:
+    get:
+      operationId: getDashboardStats
+      tags: [stats]
+      summary: Get dashboard statistics
+      responses:
+        "200":
+          description: Statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
 
+    AuthUserRole:
+      type: string
+      enum: [admin, student]
+
+    AuthUser:
+      type: object
+      required: [role]
+      properties:
+        email:
+          type: ["string", "null"]
+        role:
+          $ref: "#/components/schemas/AuthUserRole"
+        name:
+          type: ["string", "null"]
+
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+
+    StudentLoginInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+
+    EligibilityItem:
+      type: object
+      required: [id, category, title, content, isPublished, createdAt, updatedAt]
+      properties:
+        id:
+          type: number
+        category:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        isPublished:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+
+    EligibilityInput:
+      type: object
+      required: [category, title, content]
+      properties:
+        category:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        isPublished:
+          type: boolean
+
+    EligibilityUpdate:
+      type: object
+      properties:
+        category:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+
+    McqLevel:
+      type: object
+      required: [id, levelNumber, title, questionCount]
+      properties:
+        id:
+          type: number
+        levelNumber:
+          type: number
+        title:
+          type: string
+        questionCount:
+          type: number
+
+    McqQuestion:
+      type: object
+      required: [id, levelId, question, optionA, optionB, optionC, optionD, correctAnswer, orderIndex]
+      properties:
+        id:
+          type: number
+        levelId:
+          type: number
+        question:
+          type: string
+        optionA:
+          type: string
+        optionB:
+          type: string
+        optionC:
+          type: string
+        optionD:
+          type: string
+        correctAnswer:
+          type: string
+        orderIndex:
+          type: number
+
+    McqQuestionInput:
+      type: object
+      required: [question, optionA, optionB, optionC, optionD, correctAnswer]
+      properties:
+        question:
+          type: string
+        optionA:
+          type: string
+        optionB:
+          type: string
+        optionC:
+          type: string
+        optionD:
+          type: string
+        correctAnswer:
+          $ref: "#/components/schemas/McqQuestionInputCorrectAnswer"
+        orderIndex:
+          type: number
+
+    McqQuestionInputCorrectAnswer:
+      type: string
+      enum: [A, B, C, D]
+
+    McqQuestionUpdate:
+      type: object
+      properties:
+        question:
+          type: string
+        optionA:
+          type: string
+        optionB:
+          type: string
+        optionC:
+          type: string
+        optionD:
+          type: string
+        correctAnswer:
+          $ref: "#/components/schemas/McqQuestionUpdateCorrectAnswer"
+        orderIndex:
+          type: number
+
+    McqQuestionUpdateCorrectAnswer:
+      type: string
+      enum: [A, B, C, D]
+
+    McqQuestionCorrectAnswer:
+      type: string
+      enum: [A, B, C, D]
+
+    McqAnswer:
+      type: object
+      required: [questionId, selectedAnswer]
+      properties:
+        questionId:
+          type: number
+        selectedAnswer:
+          $ref: "#/components/schemas/McqAnswerSelectedAnswer"
+
+    McqAnswerSelectedAnswer:
+      type: string
+      enum: [A, B, C, D]
+
+    McqSubmission:
+      type: object
+      required: [levelId, answers]
+      properties:
+        levelId:
+          type: number
+        answers:
+          type: array
+          items:
+            $ref: "#/components/schemas/McqAnswer"
+
+    McqResult:
+      type: object
+      required: [score, total, percentage]
+      properties:
+        score:
+          type: number
+        total:
+          type: number
+        percentage:
+          type: number
+
+    EssayItem:
+      type: object
+      required: [id, title, content, isPublished, createdAt, updatedAt]
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        content:
+          type: string
+        isPublished:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+
+    EssayInput:
+      type: object
+      required: [title, content]
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        isPublished:
+          type: boolean
+
+    EssayUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+
+    PhysicalItem:
+      type: object
+      required: [id, category, title, content, isPublished, createdAt, updatedAt]
+      properties:
+        id:
+          type: number
+        category:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        isPublished:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+
+    PhysicalInput:
+      type: object
+      required: [category, title, content]
+      properties:
+        category:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        isPublished:
+          type: boolean
+
+    PhysicalUpdate:
+      type: object
+      properties:
+        category:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+
+    FinalTestQuestion:
+      type: object
+      required: [id, question, optionA, optionB, optionC, optionD, correctAnswer, orderIndex]
+      properties:
+        id:
+          type: number
+        question:
+          type: string
+        optionA:
+          type: string
+        optionB:
+          type: string
+        optionC:
+          type: string
+        optionD:
+          type: string
+        correctAnswer:
+          $ref: "#/components/schemas/FinalTestQuestionCorrectAnswer"
+        orderIndex:
+          type: number
+
+    FinalTestQuestionCorrectAnswer:
+      type: string
+      enum: [A, B, C, D]
+
+    FinalTestQuestionInput:
+      type: object
+      required: [question, optionA, optionB, optionC, optionD, correctAnswer]
+      properties:
+        question:
+          type: string
+        optionA:
+          type: string
+        optionB:
+          type: string
+        optionC:
+          type: string
+        optionD:
+          type: string
+        correctAnswer:
+          $ref: "#/components/schemas/FinalTestQuestionInputCorrectAnswer"
+        orderIndex:
+          type: number
+
+    FinalTestQuestionInputCorrectAnswer:
+      type: string
+      enum: [A, B, C, D]
+
+    FinalTestQuestionUpdate:
+      type: object
+      properties:
+        question:
+          type: string
+        optionA:
+          type: string
+        optionB:
+          type: string
+        optionC:
+          type: string
+        optionD:
+          type: string
+        correctAnswer:
+          $ref: "#/components/schemas/FinalTestQuestionUpdateCorrectAnswer"
+        orderIndex:
+          type: number
+
+    FinalTestQuestionUpdateCorrectAnswer:
+      type: string
+      enum: [A, B, C, D]
+
+    FinalTestAnswer:
+      type: object
+      required: [questionId, selectedAnswer]
+      properties:
+        questionId:
+          type: number
+        selectedAnswer:
+          $ref: "#/components/schemas/FinalTestAnswerSelectedAnswer"
+
+    FinalTestAnswerSelectedAnswer:
+      type: string
+      enum: [A, B, C, D]
+
+    FinalTestSubmission:
+      type: object
+      required: [studentName, answers]
+      properties:
+        studentName:
+          type: string
+        answers:
+          type: array
+          items:
+            $ref: "#/components/schemas/FinalTestAnswer"
+
+    FinalTestResult:
+      type: object
+      required: [id, studentName, score, total, percentage, submittedAt]
+      properties:
+        id:
+          type: number
+        studentName:
+          type: string
+        score:
+          type: number
+        total:
+          type: number
+        percentage:
+          type: number
+        submittedAt:
+          type: string
+
+    PublishInput:
+      type: object
+      required: [isPublished]
+      properties:
+        isPublished:
+          type: boolean
+
+    DashboardStats:
+      type: object
+      required: [totalStudents, activeStudents, publishedContent, totalLevels, eligibilityCount, mcqLevelsWithQuestions, essayCount, physicalCount, finalTestQuestionCount, finalTestResultCount]
+      properties:
+        totalStudents:
+          type: number
+        activeStudents:
+          type: number
+        publishedContent:
+          type: number
+        totalLevels:
+          type: number
+        eligibilityCount:
+          type: number
+        mcqLevelsWithQuestions:
+          type: number
+        essayCount:
+          type: number
+        physicalCount:
+          type: number
+        finalTestQuestionCount:
+          type: number
+        finalTestResultCount:
+          type: number
