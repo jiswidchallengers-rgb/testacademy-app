@@ -19,6 +19,10 @@ if (!process.env.SESSION_SECRET) {
 
 const app: Express = express();
 
+// Trust the reverse proxy (Replit / any HTTPS-terminating proxy)
+// so that req.secure is true and secure cookies are set correctly.
+app.set("trust proxy", 1);
+
 app.use(
   pinoHttp({
     logger,
@@ -51,6 +55,9 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      // sameSite "none" is required for cross-origin iframe contexts in production
+      // (Replit deployed preview). "lax" is fine for local dev.
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     },
   }),

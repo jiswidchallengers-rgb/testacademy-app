@@ -1,17 +1,20 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { useGetMe, useLogout } from "@workspace/api-client-react";
+import { useGetMe, useLogout, getGetMeQueryKey } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
 import logoUrl from "@assets/IMG-20260728-WA0015_1785304473912.jpg";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { data: user, isLoading } = useGetMe();
   const logout = useLogout();
+  const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
 
   const handleLogout = () => {
     logout.mutate(undefined, {
       onSuccess: () => {
-        window.location.reload();
+        queryClient.invalidateQueries({ queryKey: getGetMeQueryKey() });
+        setLocation("/");
       }
     });
   }

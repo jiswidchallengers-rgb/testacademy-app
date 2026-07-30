@@ -1,7 +1,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useStudentLogin } from "@workspace/api-client-react";
+import { useStudentLogin, getGetMeQueryKey } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +21,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const studentLogin = useStudentLogin();
 
   const form = useForm<LoginFormValues>({
@@ -34,8 +36,8 @@ export function Login() {
           title: "Welcome!",
           description: `Good luck with your preparation, ${data.name.trim()}!`,
         });
+        queryClient.invalidateQueries({ queryKey: getGetMeQueryKey() });
         setLocation("/");
-        window.location.reload();
       },
       onError: () => {
         toast({

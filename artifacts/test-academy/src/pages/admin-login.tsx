@@ -1,7 +1,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useLogin } from "@workspace/api-client-react";
+import { useLogin, getGetMeQueryKey } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +22,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export function AdminLogin() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const login = useLogin();
 
   const form = useForm<LoginFormValues>({
@@ -35,8 +37,8 @@ export function AdminLogin() {
           title: "Admin Login Successful",
           description: "Welcome to the Admin Panel.",
         });
+        queryClient.invalidateQueries({ queryKey: getGetMeQueryKey() });
         setLocation("/admin");
-        window.location.reload();
       },
       onError: () => {
         toast({
