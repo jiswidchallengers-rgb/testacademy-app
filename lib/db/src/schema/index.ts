@@ -4,3 +4,4 @@ export * from "./essay";
 export * from "./physical";
 export * from "./finaltest";
 export * from "./students";
+export * from "./monetization";

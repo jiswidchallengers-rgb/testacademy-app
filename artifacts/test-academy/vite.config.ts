@@ -72,6 +72,19 @@ export default defineConfig({
     fs: {
       strict: true,
     },
+    // Dev-only, opt-in proxy. Only active when API_PROXY_TARGET is set
+    // (used by the v0 single-port preview). Replit never sets this env var,
+    // so its own dev/deploy routing is completely unaffected.
+    ...(process.env.API_PROXY_TARGET
+      ? {
+          proxy: {
+            '/api': {
+              target: process.env.API_PROXY_TARGET,
+              changeOrigin: true,
+            },
+          },
+        }
+      : {}),
   },
   preview: {
     port,
